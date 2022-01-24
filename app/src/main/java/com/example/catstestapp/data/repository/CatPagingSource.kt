@@ -1,33 +1,36 @@
 package com.example.catstestapp.data.repository
 
-import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.catstestapp.data.remote.CatsApiService
-import com.example.catstestapp.data.remote.model.toCat
 import com.example.catstestapp.domain.model.Cat
 
 class CatPagingSource(
-    private val catApiService: CatsApiService,
+    private val api: CatsApiService
 ) : PagingSource<Int, Cat>() {
-    override fun getRefreshKey(state: PagingState<Int, Cat>): Int {
-        return CAT_STARTING_PAGE_INDEX
-    }
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Cat> {
-        val position = params.key ?: CAT_STARTING_PAGE_INDEX
-
         return try {
-            val photos: List<Cat> =
-                catApiService.getCatItems(params.loadSize, position).map { it.toCat() }
-            Log.d("CatPagingSource", photos.size.toString())
+            val nextPageNumber = params.key ?: CAT_STARTING_PAGE_INDEX
+            val response = api
+                .getCatItems(page = nextPageNumber, limit = params.loadSize)
             LoadResult.Page(
-                data = photos,
-                prevKey = if (position == CAT_STARTING_PAGE_INDEX) null else position - 1,
-                nextKey = if (photos.isEmpty()) null else position + 1
+                data = response,
+                prevKey = if (nextPageNumber == CAT_STARTING_PAGE_INDEX) null
+                else nextPageNumber - 1,
+                nextKey = if (response.isEmpty()) null else nextPageNumber + 1
             )
-        } catch (exception: Exception) {
-            LoadResult.Error(exception)
+        } catch (e: retrofit2.HttpException) {
+            LoadResult.Error(e)
+        } catch (e: Exception) {
+            LoadResult.Error(e)
+        }
+    }
+
+    override fun getRefreshKey(state: PagingState<Int, Cat>): Int? {
+        return state.anchorPosition?.let {
+            state.closestPageToPosition(it)?.prevKey?.plus(1)
+                ?: state.closestPageToPosition(it)?.nextKey?.minus(1)
         }
     }
 
