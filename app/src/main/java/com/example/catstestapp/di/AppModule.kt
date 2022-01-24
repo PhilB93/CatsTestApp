@@ -17,7 +17,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
-private const val BASE_URL = "https://api.thecatapi.com/"
+private const val BASE_URL = "https://api.thecatapi.com/v1/"
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -67,8 +67,9 @@ class AppModule {
     @Provides
     @Singleton
     fun provideWordInfoRepository(
-        factory: CatPagingSourceFactory
+        factory: CatPagingSourceFactory,
+        catFavoritesDatabase: CatFavoritesDatabase
     ): CatRepository {
-        return CatRepositoryImpl(factory)
+        return CatRepositoryImpl(factory,catFavoritesDatabase)
     }
 }
