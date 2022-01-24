@@ -1,6 +1,6 @@
 package com.example.catstestapp.data.local.entity
 
-import com.example.catstestapp.domain.model.Cat
+
 import com.example.catstestapp.domain.model.Image
 import com.google.gson.annotations.SerializedName
 
