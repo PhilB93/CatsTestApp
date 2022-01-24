@@ -4,7 +4,6 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.catstestapp.domain.model.Cat
-import com.example.catstestapp.domain.model.Image
 
 @Entity
 data class CatEntity(
