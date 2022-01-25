@@ -64,6 +64,8 @@ class ListFragment : Fragment(R.layout.list_fragment), ListOfCatsListener {
             with(binding) {
                 recyclerView.isVisible = state.refresh != LoadState.Loading
                 progressBar.isVisible = state.refresh == LoadState.Loading
+                buttonRetry.isVisible = state.source.refresh is LoadState.Error
+                textViewError.isVisible = state.source.refresh is LoadState.Error
             }
         }
         binding.buttonRetry.setOnClickListener {
